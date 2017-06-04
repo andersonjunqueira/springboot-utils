@@ -27,12 +27,12 @@ public class RestFullEndpoint<E, PK extends Serializable> {
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResponseEntity<E> getWithId(@PathVariable PK id) {
-        return new ResponseEntity<>(service.findById(id),HttpStatus.OK);
+        return new ResponseEntity<>(service.findOne(id), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> add(@RequestBody E input) {
-        return new ResponseEntity<>(service.create(input), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(input), HttpStatus.CREATED);
     }
 
 }

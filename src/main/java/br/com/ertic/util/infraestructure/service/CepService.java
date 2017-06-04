@@ -5,12 +5,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import br.com.ertic.util.infraestructure.dto.ZipCodeDTO;
+import br.com.ertic.util.infraestructure.dto.CepDTO;
 
 @Service
-public class ZipCodeService {
+public class CepService {
 
-    public ZipCodeDTO find(String zipcode) {
+    public CepDTO find(String zipcode) {
 
         RestTemplate rest = new RestTemplate();
         MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
@@ -18,7 +18,7 @@ public class ZipCodeService {
         map.add("metodo", "buscarCep");
         String result = rest.postForObject("http://m.correios.com.br/movel/buscaCepConfirma.do?metodo=buscarCep&cepEntrada=" + zipcode, map, String.class);
 
-        ZipCodeDTO saida = parseHtml(result);
+        CepDTO saida = parseHtml(result);
 
         if(saida == null) {
             return null;
@@ -28,9 +28,9 @@ public class ZipCodeService {
         return saida;
     }
 
-    private ZipCodeDTO parseHtml(String html) {
+    private CepDTO parseHtml(String html) {
 
-        ZipCodeDTO dto = new ZipCodeDTO();
+        CepDTO dto = new CepDTO();
 
         boolean encontrou = false;
 

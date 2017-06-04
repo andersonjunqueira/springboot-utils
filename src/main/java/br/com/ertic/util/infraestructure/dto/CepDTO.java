@@ -1,6 +1,6 @@
 package br.com.ertic.util.infraestructure.dto;
 
-public final class ZipCodeDTO {
+public final class CepDTO {
 
     private String cep;
     private String logradouro;
