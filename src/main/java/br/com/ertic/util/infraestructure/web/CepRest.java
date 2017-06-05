@@ -1,4 +1,4 @@
-package br.com.ertic.util.infraestructure.exception;
+package br.com.ertic.util.infraestructure.web;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,19 +12,19 @@ import br.com.ertic.util.infraestructure.dto.CepDTO;
 import br.com.ertic.util.infraestructure.service.CepService;
 
 @RestController
-@RequestMapping("/zipcodes")
-public class ZipCodeRest {
+@RequestMapping("/ceps")
+public class CepRest {
 
     private final CepService service;
 
     @Autowired
-    ZipCodeRest(CepService service) {
+    CepRest(CepService service) {
         this.service = service;
     }
 
-    @RequestMapping(value="/{zipcode}", method = RequestMethod.GET)
-    public CepDTO getDocument(@PathVariable String zipcode, HttpServletResponse response) {
-        CepDTO saida = service.find(zipcode);
+    @RequestMapping(value="/{cep}", method = RequestMethod.GET)
+    public CepDTO getDocument(@PathVariable String cep, HttpServletResponse response) {
+        CepDTO saida = service.find(cep);
         if(null == saida){
            response.setStatus(404);
         }
