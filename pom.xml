@@ -15,8 +15,8 @@
         <version>1.5.2.RELEASE</version>
     </parent>
 
-    <name>eventos-springboot</name>
-    <description>Demo project for Spring Boot</description>
+    <name>SpringBoot Util Classes</name>
+    <description>ERTIC SpringBoot Utility Classes</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
