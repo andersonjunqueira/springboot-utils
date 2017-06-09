@@ -4,20 +4,23 @@ import br.com.ertic.util.infraestructure.log.Log;
 
 public class TimeCount {
 
+    private Class<?> clazz;
     private String name;
     private long inicio;
 
-    private TimeCount(String name) {
+    private TimeCount(Class<?> clazz, String name) {
         this.name = name;
+        this.clazz = clazz;
         inicio = System.currentTimeMillis();
     }
 
-    public static TimeCount start(String name) {
-        return new TimeCount(name);
+    public static TimeCount start(Class<?> clazz, String name) {
+        return new TimeCount(clazz, name);
     }
 
-    public void end() {
+    public long end() {
         Long tempo = System.currentTimeMillis() - inicio;
-        Log.debug(this.getClass(), name + " - " + tempo);
+        Log.debug(clazz, name + " - " + tempo);
+        return tempo;
     }
 }
