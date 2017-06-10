@@ -65,8 +65,8 @@
     </build>
 
     <scm>
-        <connection>scm:git:ssh://bitbucket.org:ertic/springboot-utils.git</connection>
-        <developerConnection>scm:git:ssh://bitbucket.org:ertic/springboot-utils.git</developerConnection>
+        <connection>scm:git:https://github.com/andersonjunqueira/springboot-utils.git</connection>
+        <developerConnection>scm:git:https://github.com/andersonjunqueira/springboot-utils.git</developerConnection>
     </scm>
 
 </project>
