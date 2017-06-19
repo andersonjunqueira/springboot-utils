@@ -11,7 +11,7 @@ package br.com.ertic.util.infraestructure.exception;
  * @see <a href="https://httpstatuses.com/">https://httpstatuses.com/</a>
  * @since 1.0.0
  */
-public class EmailException extends GeneralException {
+public class RequisicaoInvalidaException extends GeneralException {
 
     private static final long serialVersionUID = 7750277264481007108L;
 
@@ -19,7 +19,7 @@ public class EmailException extends GeneralException {
      * Construtor padrão da exceção.
      * @param statusCode código de erro HTTP
      */
-    public EmailException() {
+    public RequisicaoInvalidaException() {
         super();
     }
 
@@ -28,7 +28,7 @@ public class EmailException extends GeneralException {
      * @param statusCode código de erro HTTP
      * @param msg mensagem do erro
      */
-    public EmailException(String msg) {
+    public RequisicaoInvalidaException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class EmailException extends GeneralException {
      * @param statusCode código de erro HTTP
      * @param cause causa origem da exceção lançada
      */
-    public EmailException(Throwable cause) {
+    public RequisicaoInvalidaException(Throwable cause) {
         super(cause);
     }
 
@@ -47,7 +47,7 @@ public class EmailException extends GeneralException {
      * @param msg mensagem do erro
      * @param cause causa origem da exceção lançada
      */
-    public EmailException(String msg, Throwable cause) {
+    public RequisicaoInvalidaException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
