@@ -15,7 +15,7 @@
         <version>1.5.2.RELEASE</version>
     </parent>
 
-    <name>SpringBoot Util Classes</name>
+    <name>SPRINGBOOT-UTILS</name>
     <description>ERTIC SpringBoot Utility Classes</description>
 
     <properties>
