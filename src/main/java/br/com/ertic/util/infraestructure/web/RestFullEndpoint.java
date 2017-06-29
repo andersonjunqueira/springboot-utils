@@ -26,20 +26,40 @@ public class RestFullEndpoint<E, PK extends Serializable> {
         return service;
     }
 
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<?> add(@RequestBody E input) {
+        return new ResponseEntity<>(service.save(input), HttpStatus.CREATED);
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<E>> getAll(HttpServletRequest request) {
-        return new ResponseEntity<>(
-            service.findAll(request.getParameterMap()),HttpStatus.OK);
+        List<E> saida = service.findAll(request.getParameterMap());
+        if(saida == null || saida.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(saida, HttpStatus.OK);
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public ResponseEntity<E> getWithId(@PathVariable PK id) {
-        return new ResponseEntity<>(service.findOne(id), HttpStatus.OK);
+        E saida = service.findOne(id);
+        if(saida == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(saida, HttpStatus.OK);
+        }
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> add(@RequestBody E input) {
-        return new ResponseEntity<>(service.save(input), HttpStatus.CREATED);
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    public ResponseEntity<?> delete(@PathVariable PK id) {
+        E saida = service.findOne(id);
+        if(saida == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            service.delete(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 
 }
