@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,14 @@ public class RestFullService<E, PK extends Serializable> {
 
     public List<E> findAll(Example<E> example) {
         return repository.findAll(example);
+    }
+
+    public List<E> findAll(Example<E> example, Sort sort) {
+        return repository.findAll(example, sort);
+    }
+
+    public List<E> findAll(Sort sort) {
+        return repository.findAll(sort);
     }
 
     public List<E> findAll(Map<String, String[]> params) {
