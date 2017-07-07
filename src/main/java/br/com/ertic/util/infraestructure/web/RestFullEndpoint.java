@@ -34,7 +34,7 @@ public class RestFullEndpoint<E, PK extends Serializable> {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Page<E>> getAll(HttpServletRequest request) {
         Page<E> saida = service.findAllPageable(request.getParameterMap());
-        if(saida == null) {
+        if(saida == null || saida.getSize() == 0) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(saida, HttpStatus.OK);
