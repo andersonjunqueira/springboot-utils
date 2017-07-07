@@ -1,10 +1,10 @@
 package br.com.ertic.util.infraestructure.web;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,9 +32,9 @@ public class RestFullEndpoint<E, PK extends Serializable> {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<E>> getAll(HttpServletRequest request) {
-        List<E> saida = service.findAll(request.getParameterMap());
-        if(saida == null || saida.isEmpty()) {
+    public ResponseEntity<Page<E>> getAll(HttpServletRequest request) {
+        Page<E> saida = service.findAllPageable(request.getParameterMap());
+        if(saida == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(saida, HttpStatus.OK);

@@ -1,13 +1,20 @@
 package br.com.ertic.util.infraestructure.service;
 
+import static org.springframework.data.domain.ExampleMatcher.matching;
+
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.ertic.util.infraestructure.exception.InternalException;
 
 public class RestFullService<E, PK extends Serializable> {
+
+    private final String SORT_KEY = "sort";
+    private final String DESC_KEY = "desc";
+    private final String PAGESIZE_KEY = "page";
+    private final String PAGESTART_KEY = "start";
+    private final int PAGESIZE_DEFAULT = 10;
+    private static List<String> IGNORED_KEYS = new ArrayList<>();
 
     private Class<E> modelClass;
     protected final JpaRepository<E, PK> repository;
@@ -53,30 +67,95 @@ public class RestFullService<E, PK extends Serializable> {
     }
 
     public List<E> findAll(Map<String, String[]> params) {
+        return repository.findAll(getExample(params), getSort(params));
+    }
+
+    public Page<E> findAllPageable(Map<String, String[]> params) {
+        return repository.findAll(getExample(params), getPageRequest(params));
+    }
+
+    private Pageable getPageRequest(Map<String, String[]> params) {
+
+        int start = 0;
+        int size = 10;
+
+        String[] startParam = params.get(PAGESTART_KEY);
+        if(startParam != null) {
+            start = Integer.parseInt(startParam[0]);
+            start = start < 0 ? 0 : start;
+        }
+
+        String[] sizeParam = params.get(PAGESIZE_KEY);
+        if(sizeParam != null) {
+            size = Integer.parseInt(sizeParam[0]);
+            size = size < 1 ? PAGESIZE_DEFAULT : size;
+        }
+
+        return new PageRequest(start, size, getSort(params));
+
+    }
+
+    private Sort getSort(Map<String, String[]> params) {
+        String[] sort = params.get(SORT_KEY);
+        if(sort != null && sort.length == 1) {
+            String field = sort[0];
+            Sort.Direction direction = Sort.Direction.ASC;
+            if(field.indexOf(",") > -1) {
+                String[] tokens = field.split(",");
+                field = tokens[0];
+                direction = tokens[1].equalsIgnoreCase(DESC_KEY) ? Sort.Direction.DESC : Sort.Direction.ASC;
+            }
+            return new Sort(direction, field);
+        }
+
+        return null;
+    }
+
+    private Example<E> getExample(Map<String, String[]> params) {
+
+        if(IGNORED_KEYS.isEmpty()) {
+            IGNORED_KEYS.add(SORT_KEY);
+            IGNORED_KEYS.add(PAGESIZE_KEY);
+            IGNORED_KEYS.add(PAGESTART_KEY);
+        }
+
         try {
+
             E obj = modelClass.newInstance();
+            ExampleMatcher em = matching();
 
             for(String key : params.keySet()) {
-                if(params.get(key).length != 1) {
+
+                if(IGNORED_KEYS.contains(key)) {
+                    continue;
+                }
+
+                String[] values = params.get(key);
+                if(values.length != 1) {
                     continue;
                 }
 
                 Method m = getMethodFromProperty(key);
                 if(m != null) {
-                    if(m.getParameterTypes()[0].isInstance(Long.class)) {
-                        m.invoke(obj, Long.parseLong(params.get(key)[0]));
+                    if(m.getParameterTypes()[0].equals(String.class)) {
 
-                    } else if(m.getParameterTypes()[0].isInstance(Double.class)) {
-                        m.invoke(obj, Double.parseDouble(params.get(key)[0]));
+                        if(values[0].startsWith("*")) {
+                            em = matching().withMatcher(key, matcher -> matcher.endsWith().ignoreCase());
 
-                    } else if(m.getParameterTypes()[0].isInstance(String.class)) {
-                        m.invoke(obj, params.get(key)[0] + "%");
+                        } else if(values[0].endsWith("*")) {
+                            em = matching().withMatcher(key, matcher -> matcher.startsWith().ignoreCase());
+
+                        } else {
+                            em = matching().withMatcher(key, matcher -> matcher.ignoreCase());
+                        }
                     }
+
+                    m.invoke(obj, values[0].replaceAll("\\*", ""));
                 }
 
             }
 
-            return repository.findAll(Example.of(obj));
+            return Example.of(obj, em);
 
         } catch(IllegalAccessException | InstantiationException | InvocationTargetException ex) {
             throw new InternalException("problemas-classe-findall", ex);
