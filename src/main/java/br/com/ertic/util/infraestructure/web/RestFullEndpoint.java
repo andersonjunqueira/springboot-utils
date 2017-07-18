@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.keycloak.representations.AccessToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,9 @@ import br.com.ertic.util.infraestructure.service.RestFullService;
 
 public class RestFullEndpoint<E, PK extends Serializable> {
 
+    @Autowired
+    private AccessToken accessToken;
+
     protected RestFullService<E, PK> service;
 
     protected RestFullEndpoint(RestFullService<E, PK> service) {
@@ -26,6 +31,9 @@ public class RestFullEndpoint<E, PK extends Serializable> {
         return service;
     }
 
+    protected AccessToken getToken() {
+        return accessToken;
+    }
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> add(@RequestBody E input) {
         return new ResponseEntity<>(service.save(input), HttpStatus.CREATED);
@@ -52,7 +60,7 @@ public class RestFullEndpoint<E, PK extends Serializable> {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public ResponseEntity<?> delete(@PathVariable PK id) {
+    public ResponseEntity<?> delete(@PathVariable PK id, String userEmail) {
         E saida = service.findOne(id);
         if(saida == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
