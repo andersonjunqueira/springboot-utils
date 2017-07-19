@@ -14,13 +14,13 @@ import br.com.ertic.util.infraestructure.service.CepService;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/ceps")
-public class CepsRest {
+@RequestMapping("/api/ceps")
+public class CepsController {
 
     private final CepService service;
 
     @Autowired
-    CepsRest(CepService service) {
+    CepsController(CepService service) {
         this.service = service;
     }
 
