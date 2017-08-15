@@ -16,12 +16,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.ertic.util.infraestructure.domain.model.EntidadeBase;
 import br.com.ertic.util.infraestructure.exception.InternalException;
+import br.com.ertic.util.infraestructure.jpa.RepositoryBase;
 
-public class RestFullService<E, PK extends Serializable> {
+public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable> {
 
     private final String SORT_KEY = "sort";
     private final String DESC_KEY = "desc";
@@ -31,7 +32,7 @@ public class RestFullService<E, PK extends Serializable> {
     private static List<String> IGNORED_KEYS = new ArrayList<>();
 
     private Class<E> modelClass;
-    protected final JpaRepository<E, PK> repository;
+    protected final RepositoryBase<E, PK> repository;
 
     @SuppressWarnings("unchecked")
     private void loadTypes() {
@@ -41,12 +42,12 @@ public class RestFullService<E, PK extends Serializable> {
         }
     }
 
-    protected RestFullService(JpaRepository<E, PK> repository) {
+    protected RestFullService(RepositoryBase<E, PK> repository) {
         this.repository = repository;
         loadTypes();
     }
 
-    protected JpaRepository<E, PK> getRepository() {
+    protected RepositoryBase<E, PK> getRepository() {
         return repository;
     }
 
@@ -184,6 +185,11 @@ public class RestFullService<E, PK extends Serializable> {
     @Transactional
     public E save(E e) {
         return repository.save(e);
+    }
+
+    @Transactional
+    public Long nextVal(String sequenceName) {
+        return repository.nextVal(sequenceName);
     }
 
 }

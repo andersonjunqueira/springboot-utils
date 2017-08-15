@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import br.com.ertic.util.infraestructure.domain.model.EntidadeBase;
 import br.com.ertic.util.infraestructure.dto.Token;
 import br.com.ertic.util.infraestructure.service.RestFullService;
 
-public class RestFullEndpoint<E, PK extends Serializable> {
+public class RestFullEndpoint<E extends EntidadeBase<PK>, PK extends Serializable> {
 
     @Autowired
     protected Token token;
