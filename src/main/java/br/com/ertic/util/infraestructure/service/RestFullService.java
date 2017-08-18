@@ -138,6 +138,8 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
                 Method m = getMethodFromProperty(key);
                 if(m != null) {
+
+                    // TRATAMENTOS DE PARAMETROS DO TIPO STRING
                     if(m.getParameterTypes()[0].equals(String.class)) {
 
                         if(values[0].startsWith("*")) {
