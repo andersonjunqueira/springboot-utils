@@ -75,7 +75,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         return repository.findAll(getExample(params), getPageRequest(params));
     }
 
-    private Pageable getPageRequest(Map<String, String[]> params) {
+    protected Pageable getPageRequest(Map<String, String[]> params) {
 
         int start = 0;
         int size = 10;
@@ -96,7 +96,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
     }
 
-    private Sort getSort(Map<String, String[]> params) {
+    protected Sort getSort(Map<String, String[]> params) {
         String[] sort = params.get(SORT_KEY);
         if(sort != null && sort.length == 1) {
             String field = sort[0];
@@ -112,7 +112,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         return null;
     }
 
-    private Example<E> getExample(Map<String, String[]> params) {
+    protected Example<E> getExample(Map<String, String[]> params) {
 
         if(IGNORED_KEYS.isEmpty()) {
             IGNORED_KEYS.add(SORT_KEY);
@@ -165,7 +165,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         }
     }
 
-    private Method getMethodFromProperty(String property) {
+    protected Method getMethodFromProperty(String property) {
         String mName = "set" + property.substring(0, 1).toUpperCase() + property.substring(1);
         for(Method m : modelClass.getMethods()) {
             if(m.getName().equals(mName) && m.getParameterTypes().length == 1) {
