@@ -32,8 +32,43 @@ public class RestFullEndpoint<E extends EntidadeBase<PK>, PK extends Serializabl
         return service;
     }
 
+    /**
+     * Método para inclusão de novos registros.
+     * Caso a entidade enviada possuir o atributo "id" preenchido, um erro 400 / BAD REQUEST é retornado.
+     * @param input entidade a ser incluída
+     * @return os dados da entidade registrada
+     */
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> add(@RequestBody E input) {
+        if(input.getId() != null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(service.save(input), HttpStatus.CREATED);
+    }
+
+    /**
+     * Método para inclusão ou atualização de registros.
+     * Caso a entidade enviada possuir o atributo "id" preenchido, será feita uma atualização do registro (retorno 200).
+     * Caso a entidade enviada não possua o atributo "id" preenchido, será feita uma inclusão do registro (retorno 201).
+     * @param input entidade a ser incluída ou atualizada
+     * @return os dados da entidade registrada
+     */
+    @RequestMapping(method = RequestMethod.PUT)
+    public ResponseEntity<?> addOrUpdate(@RequestBody E input) {
+        return new ResponseEntity<>(
+            service.save(input),
+            input.getId() == null ? HttpStatus.CREATED : HttpStatus.OK);
+    }
+
+    /**
+     * Método para atualização de registros.
+     * O valor informado como id na URL irá sobrepor o id da entidade enviada (se houver). Será feita uma atualização do registro.
+     * @param input entidade a ser atualizada
+     * @return os dados da entidade registrada
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
+    public ResponseEntity<?> addOrUpdateByPK(@RequestBody E input, @PathVariable PK id) {
+        input.setId(id);
         return new ResponseEntity<>(service.save(input), HttpStatus.CREATED);
     }
 
