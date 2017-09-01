@@ -11,7 +11,7 @@ package br.com.ertic.util.infraestructure.exception;
  * @see <a href="https://httpstatuses.com/">https://httpstatuses.com/</a>
  * @since 1.0.0
  */
-public class InternalException extends GeneralException {
+public class InternalException extends RuntimeException {
 
     private static final long serialVersionUID = 7750277264481007108L;
 

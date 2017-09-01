@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.ertic.util.infraestructure.domain.model.EntidadeBase;
 import br.com.ertic.util.infraestructure.exception.InternalException;
+import br.com.ertic.util.infraestructure.exception.NegocioException;
 import br.com.ertic.util.infraestructure.jpa.RepositoryBase;
 
 public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable> {
@@ -51,28 +52,47 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         return repository;
     }
 
-    public List<E> findAll() {
+    public List<E> findAll() throws NegocioException {
         return repository.findAll();
     }
 
-    public List<E> findAll(Example<E> example) {
+    public List<E> findAll(Example<E> example) throws NegocioException {
         return repository.findAll(example);
     }
 
-    public List<E> findAll(Example<E> example, Sort sort) {
+    public List<E> findAll(Example<E> example, Sort sort) throws NegocioException {
         return repository.findAll(example, sort);
     }
 
-    public List<E> findAll(Sort sort) {
+    public List<E> findAll(Sort sort) throws NegocioException {
         return repository.findAll(sort);
     }
 
-    public List<E> findAll(Map<String, String[]> params) {
+    public List<E> findAll(Map<String, String[]> params) throws NegocioException {
         return repository.findAll(getExample(params), getSort(params));
     }
 
-    public Page<E> findAllPageable(Map<String, String[]> params) {
+    public Page<E> findAllPageable(Map<String, String[]> params) throws NegocioException {
         return repository.findAll(getExample(params), getPageRequest(params));
+    }
+
+    public E findOne(PK id) throws NegocioException {
+        return repository.findOne(id);
+    }
+
+    @Transactional
+    public void delete(PK id) throws NegocioException {
+        repository.delete(id);
+    }
+
+    @Transactional
+    public E save(E e) throws NegocioException {
+        return repository.save(e);
+    }
+
+    @Transactional
+    public Long nextVal(String sequenceName) throws NegocioException {
+        return repository.nextVal(sequenceName);
     }
 
     protected Pageable getPageRequest(Map<String, String[]> params) {
@@ -173,25 +193,6 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
             }
         }
         return null;
-    }
-
-    public E findOne(PK id) {
-        return repository.findOne(id);
-    }
-
-    @Transactional
-    public void delete(PK id) {
-        repository.delete(id);
-    }
-
-    @Transactional
-    public E save(E e) {
-        return repository.save(e);
-    }
-
-    @Transactional
-    public Long nextVal(String sequenceName) {
-        return repository.nextVal(sequenceName);
     }
 
 }
