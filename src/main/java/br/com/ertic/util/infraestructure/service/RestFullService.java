@@ -118,7 +118,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
     protected Sort getSort(Map<String, String[]> params) {
         String[] sort = params.get(SORT_KEY);
-        if(sort != null && sort.length == 1) {
+        if(sort != null && sort.length == 1 && sort[0].length() > 0 ) {
             String field = sort[0];
             Sort.Direction direction = Sort.Direction.ASC;
             if(field.indexOf(",") > -1) {
