@@ -132,7 +132,7 @@ public class KeycloakService {
         headers.set("Authorization", "Bearer " + accessToken);
 
         CredentialRepresentation newCredential = new CredentialRepresentation();
-        newCredential.setType("password");
+        newCredential.setType(CredentialRepresentation.PASSWORD);
         newCredential.setValue(userPassword);
         newCredential.setTemporary(false);
 

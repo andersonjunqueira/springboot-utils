@@ -101,7 +101,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
     }
 
     @Transactional
-    private E save(E e) throws NegocioException {
+    protected E save(E e) throws NegocioException {
         return repository.save(e);
     }
 
