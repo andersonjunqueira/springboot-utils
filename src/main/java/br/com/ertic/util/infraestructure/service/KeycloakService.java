@@ -2,8 +2,12 @@ package br.com.ertic.util.infraestructure.service;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
 
+import javax.ws.rs.core.Response;
+
+import org.apache.http.HttpStatus;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +25,6 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import br.com.ertic.util.infraestructure.exception.InternalException;
 import br.com.ertic.util.infraestructure.exception.NegocioException;
 import br.com.ertic.util.infraestructure.log.Log;
 
@@ -63,87 +66,58 @@ public class KeycloakService {
 
     }
 
+    private Keycloak getInstance() {
+        return Keycloak.getInstance(
+            env.getProperty("keycloak.auth-server-url"),
+            env.getProperty("keycloak.realm"),
+            env.getProperty("admin.keycloak.username"),
+            env.getProperty("admin.keycloak.password"),
+            env.getProperty("admin.keycloak.clientid"));
+    }
+
     public String createUser(String firstName, String lastName, String userEmail, String userPassword) throws NegocioException {
 
-        if(accessToken == null) {
-            getAdminToken();
-        }
-
-        if(accessToken == null) {
-            throw new InternalException("erro-recuperar-admin-token");
-        }
-
-        final String ENDPOINT = env.getProperty("keycloak.auth-server-url") + env.getProperty("admin.keycloak.usersendpoint");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + accessToken);
-
-        CredentialRepresentation newCredential = new CredentialRepresentation();
-        newCredential.setType("password");
-        newCredential.setValue(userPassword);
-        newCredential.setTemporary(false);
+//        CredentialRepresentation credential = new CredentialRepresentation();
+//        credential.setType(CredentialRepresentation.PASSWORD);
+//        credential.setValue(userPassword);
+//        credential.setTemporary(false);
 
         UserRepresentation user = new UserRepresentation();
         user.setUsername(userEmail);
-        user.setEmail(userEmail);
-        user.setEmailVerified(true);
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setCredentials(new ArrayList<CredentialRepresentation>());
-        user.getCredentials().add(newCredential);
+        user.setEmail(userEmail);
+        user.setEnabled(true);
+//        user.setCredentials(Arrays.asList(credential));
 
-        HttpEntity<?> payload = new HttpEntity<UserRepresentation>(user, headers);
+        Response r = getInstance().realm(env.getProperty("keycloak.realm")).users().create(user);
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> entity = restTemplate.exchange(ENDPOINT, HttpMethod.POST, payload, String.class);
-
-        if(entity.getStatusCodeValue() == 201) {
-            String id = entity.getHeaders().getLocation().toString();
-            id = id.substring(id.lastIndexOf("/")+1);
+        if(r.getStatus() == HttpStatus.SC_CREATED) {
+            String loc = r.getHeaderString("Location");
+            String id = loc.substring(loc.lastIndexOf("/")+1);
 
             defineUserPassword(id, userPassword);
 
-            accessToken = null;
+            return id;
 
-        } else if(entity.getStatusCodeValue() == 409) {
-            throw new NegocioException("usuario-ja-existe");
+        } else if (r.getStatus() == HttpStatus.SC_CONFLICT) {
+            throw new NegocioException("usuario-ja-registrado");
         }
 
-        return null;
+        throw new NegocioException("erro-criar-usuario");
     }
 
     public void defineUserPassword(String userId, String userPassword) throws NegocioException {
 
-        if(accessToken == null) {
-            getAdminToken();
-        }
-
-        if(accessToken == null) {
-            throw new InternalException("erro-recuperar-admin-token");
-        }
-
-        String tempUri = env.getProperty("admin.keycloak.resetpasswordendpoint");
-        tempUri = tempUri.replaceAll("\\{id\\}", userId);
-        final String ENDPOINT = env.getProperty("keycloak.auth-server-url") + tempUri;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + accessToken);
+        Keycloak k = getInstance();
+        UserResource userResource = k.realm(env.getProperty("keycloak.realm")).users().get(userId);
 
         CredentialRepresentation newCredential = new CredentialRepresentation();
         newCredential.setType(CredentialRepresentation.PASSWORD);
         newCredential.setValue(userPassword);
         newCredential.setTemporary(false);
 
-        HttpEntity<?> payload = new HttpEntity<CredentialRepresentation>(newCredential, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> entity = restTemplate.exchange(ENDPOINT, HttpMethod.PUT, payload, String.class);
-
-        if(entity.getStatusCodeValue() != 204) {
-            throw new NegocioException("senha-nao-determinada");
-        }
+        userResource.resetPassword(newCredential);
 
     }
 }
