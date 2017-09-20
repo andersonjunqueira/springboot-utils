@@ -77,18 +77,12 @@ public class KeycloakService {
 
     public String createUser(String firstName, String lastName, String userEmail, String userPassword) throws NegocioException {
 
-//        CredentialRepresentation credential = new CredentialRepresentation();
-//        credential.setType(CredentialRepresentation.PASSWORD);
-//        credential.setValue(userPassword);
-//        credential.setTemporary(false);
-
         UserRepresentation user = new UserRepresentation();
         user.setUsername(userEmail);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(userEmail);
         user.setEnabled(true);
-//        user.setCredentials(Arrays.asList(credential));
 
         Response r = getInstance().realm(env.getProperty("keycloak.realm")).users().create(user);
 
