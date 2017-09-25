@@ -97,7 +97,11 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
     @Transactional
     public E addOrUpdate(E e) throws NegocioException {
-        return save(e);
+        if(e.getId() == null) {
+            return add(e);
+        } else {
+            return update(e);
+        }
     }
 
     @Transactional
