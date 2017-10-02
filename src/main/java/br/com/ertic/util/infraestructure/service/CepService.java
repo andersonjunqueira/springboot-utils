@@ -1,8 +1,6 @@
 package br.com.ertic.util.infraestructure.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import br.com.ertic.util.infraestructure.dto.CepDTO;
@@ -13,12 +11,9 @@ public class CepService {
     public CepDTO find(String zipcode) {
 
         RestTemplate rest = new RestTemplate();
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-        map.add("cepEntrada", zipcode);
-        map.add("metodo", "buscarCep");
-        String result = rest.postForObject("http://m.correios.com.br/movel/buscaCepConfirma.do?metodo=buscarCep&cepEntrada=" + zipcode, map, String.class);
+        String result = rest.getForObject("http://www.consultaenderecos.com.br/busca-cep/" + zipcode, String.class);
 
-        CepDTO saida = parseHtml(result);
+        CepDTO saida = parseHtml(zipcode, result);
 
         if(saida == null) {
             return null;
@@ -28,68 +23,27 @@ public class CepService {
         return saida;
     }
 
-    private CepDTO parseHtml(String html) {
+    private CepDTO parseHtml(String cep, String html) {
 
         CepDTO dto = new CepDTO();
 
-        boolean encontrou = false;
+        String ref = "<td>" + cep + "</td>";
+        int refPos = html.indexOf(ref);
+        if(refPos > -1) {
 
-        String logradouro = null;
-        if(html.indexOf("Logradouro: ") > -1) {
-            html = html.substring(html.indexOf("Logradouro: "));
-            encontrou = true;
+            String data = html.substring(refPos + ref.length());
+            data = data.substring(0, data.indexOf("</tr>"));
+            data = data.trim().replaceAll("<td>", "");
+            String[] tokens = data.split("</td>");
 
-        } else if(html.indexOf("Endereço: ") > -1) {
-            html = html.substring(html.indexOf("Endereço: "));
-            encontrou = true;
+            dto.setLogradouro(tokens[0].trim());
+            dto.setBairro(tokens[1].trim());
+            dto.setCidade(tokens[2].trim());
+            dto.setUf(tokens[3].trim());
+            return dto;
         }
 
-        if(encontrou) {
-            html = html.substring(html.indexOf("respostadestaque")+18);
-            logradouro = html.substring(0, html.indexOf("</span><br/>"));
-            dto.setLogradouro(logradouro.replaceAll("[\\r\\t]", "").trim());
-        }
-
-        String bairro = null;
-        if(html.indexOf("Bairro: ") > -1) {
-            html = html.substring(html.indexOf("Bairro: "));
-            html = html.substring(html.indexOf("respostadestaque")+18);
-            bairro = html.substring(0, html.indexOf("</span><br/>"));
-
-            dto.setBairro(bairro.replaceAll("[\\r\\t]", "").trim());
-        }
-
-        encontrou = false;
-
-        String localidade = null;
-        if(html.indexOf("Localidade / UF: ") > -1) {
-            html = html.substring(html.indexOf("Localidade / UF: "));
-            encontrou = true;
-
-        } else if(html.indexOf("Localidade/UF: ") > -1) {
-            html = html.substring(html.indexOf("Localidade/UF: "));
-            encontrou = true;
-        }
-
-        if(encontrou) {
-            html = html.substring(html.indexOf("respostadestaque")+18);
-            localidade = html.substring(0, html.indexOf("</span><br/>"));
-
-            localidade = localidade.replaceAll("[\\r\\t]", "").trim();
-            dto.setUf(localidade.substring(localidade.indexOf("/")+1).trim());
-            dto.setCidade(localidade.substring(0, localidade.indexOf("/")).trim());
-        }
-
-        String cliente = null;
-        if(html.indexOf("Cliente: ") > -1) {
-            html = html.substring(html.indexOf("Cliente: "));
-            html = html.substring(html.indexOf("respostadestaque")+18);
-            cliente = html.substring(0, html.indexOf("</span><br/>"));
-
-            dto.setCliente(cliente.replaceAll("[\\r\\t]", "").trim());
-        }
-
-        return encontrou ? dto : null;
+        return null;
 
     }
 

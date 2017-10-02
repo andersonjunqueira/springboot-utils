@@ -114,4 +114,5 @@ public class KeycloakService {
         userResource.resetPassword(newCredential);
 
     }
+
 }
