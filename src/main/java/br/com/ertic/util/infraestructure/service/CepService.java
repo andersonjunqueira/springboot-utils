@@ -1,26 +1,28 @@
 package br.com.ertic.util.infraestructure.service;
 
+import java.io.IOException;
+import java.net.URL;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.ertic.util.infraestructure.dto.CepDTO;
+import br.com.ertic.util.infraestructure.log.Log;
 
 @Service
 public class CepService {
 
     public CepDTO find(String zipcode) {
 
-        RestTemplate rest = new RestTemplate();
-        String result = rest.getForObject("http://www.consultaenderecos.com.br/busca-cep/" + zipcode, String.class);
-
-        CepDTO saida = parseHtml(zipcode, result);
-
-        if(saida == null) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            CepDTO saida = mapper.readValue(new URL("https://viacep.com.br/ws/" + zipcode + "/json/"), CepDTO.class);
+            return saida;
+        } catch(IOException ex) {
+            Log.error(CepService.class, ex);
             return null;
         }
-
-        saida.setCep(zipcode);
-        return saida;
     }
 
     private CepDTO parseHtml(String cep, String html) {

@@ -1,13 +1,22 @@
 package br.com.ertic.util.infraestructure.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class CepDTO {
 
     private String cep;
     private String logradouro;
+    private String complemento;
     private String bairro;
-    private String cidade;
     private String uf;
-    private String cliente;
+    private String unidade;
+    private String gia;
+
+    @JsonProperty("localidade")
+    private String cidade;
+
+    @JsonProperty("ibge")
+    private String codigoIbge;
 
     public String getLogradouro() {
         return logradouro;
@@ -33,14 +42,6 @@ public final class CepDTO {
         this.uf = uf;
     }
 
-    public String getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(String cliente) {
-        this.cliente = cliente;
-    }
-
     public String getCidade() {
         return cidade;
     }
@@ -55,6 +56,38 @@ public final class CepDTO {
 
     public void setCep(String cep) {
         this.cep = cep;
+    }
+
+    public String getComplemento() {
+        return complemento;
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
+
+    public String getCodigoIbge() {
+        return codigoIbge;
+    }
+
+    public void setCodigoIbge(String codigoIbge) {
+        this.codigoIbge = codigoIbge;
+    }
+
+    public String getUnidade() {
+        return unidade;
+    }
+
+    public void setUnidade(String unidade) {
+        this.unidade = unidade;
+    }
+
+    public String getGia() {
+        return gia;
+    }
+
+    public void setGia(String gia) {
+        this.gia = gia;
     }
 
 }
