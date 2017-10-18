@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.ertic.util.infraestructure.dto.CepDTO;
+import br.com.ertic.util.infraestructure.dto.ViaCepDTO;
 import br.com.ertic.util.infraestructure.log.Log;
 
 @Service
@@ -17,36 +18,27 @@ public class CepService {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            CepDTO saida = mapper.readValue(new URL("https://viacep.com.br/ws/" + zipcode + "/json/"), CepDTO.class);
-            return saida;
+            ViaCepDTO t = mapper.readValue(new URL("https://viacep.com.br/ws/" + zipcode + "/json/"), ViaCepDTO.class);
+            return parse(t);
         } catch(IOException ex) {
             Log.error(CepService.class, ex);
             return null;
         }
     }
 
-    private CepDTO parseHtml(String cep, String html) {
-
-        CepDTO dto = new CepDTO();
-
-        String ref = "<td>" + cep + "</td>";
-        int refPos = html.indexOf(ref);
-        if(refPos > -1) {
-
-            String data = html.substring(refPos + ref.length());
-            data = data.substring(0, data.indexOf("</tr>"));
-            data = data.trim().replaceAll("<td>", "");
-            String[] tokens = data.split("</td>");
-
-            dto.setLogradouro(tokens[0].trim());
-            dto.setBairro(tokens[1].trim());
-            dto.setCidade(tokens[2].trim());
-            dto.setUf(tokens[3].trim());
+    private CepDTO parse(ViaCepDTO cep) {
+        if(cep != null) {
+            CepDTO dto = new CepDTO();
+            dto.setBairro(cep.getBairro());
+            dto.setCep(cep.getCep());
+            dto.setCidade(cep.getLocalidade());
+            dto.setComplemento(cep.getComplemento());
+            dto.setIbge(cep.getIbge());
+            dto.setLogradouro(cep.getLogradouro());
+            dto.setUf(cep.getUf());
             return dto;
         }
-
         return null;
-
     }
 
 }

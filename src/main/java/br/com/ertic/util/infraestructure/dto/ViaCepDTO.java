@@ -1,14 +1,16 @@
 package br.com.ertic.util.infraestructure.dto;
 
-public final class CepDTO {
+public final class ViaCepDTO {
 
     private String cep;
     private String logradouro;
     private String complemento;
     private String bairro;
-    private String cidade;
+    private String localidade;
     private String uf;
+    private String unidade;
     private String ibge;
+    private String gia;
 
     public String getLogradouro() {
         return logradouro;
@@ -50,20 +52,36 @@ public final class CepDTO {
         this.complemento = complemento;
     }
 
+    public String getUnidade() {
+        return unidade;
+    }
+
+    public void setUnidade(String unidade) {
+        this.unidade = unidade;
+    }
+
+    public String getGia() {
+        return gia;
+    }
+
+    public void setGia(String gia) {
+        this.gia = gia;
+    }
+
+    public String getLocalidade() {
+        return localidade;
+    }
+
+    public void setLocalidade(String localidade) {
+        this.localidade = localidade;
+    }
+
     public String getIbge() {
         return ibge;
     }
 
     public void setIbge(String ibge) {
         this.ibge = ibge;
-    }
-
-    public String getCidade() {
-        return cidade;
-    }
-
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
     }
 
 }
