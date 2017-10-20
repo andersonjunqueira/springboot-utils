@@ -3,6 +3,7 @@ package br.com.ertic.util.infraestructure.service;
 
 import java.io.IOException;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
@@ -90,12 +91,16 @@ public class KeycloakService {
             String loc = r.getHeaderString("Location");
             String id = loc.substring(loc.lastIndexOf("/")+1);
 
-            defineUserPassword(id, userPassword);
-
-            return id;
+            try {
+                defineUserPassword(id, userPassword);
+                return id;
+            } catch(BadRequestException ex) {
+                getInstance().realm(env.getProperty("keycloak.realm")).users().delete(id);
+                throw new NegocioException("erro-criar-senha");
+            }
 
         } else if (r.getStatus() == HttpStatus.SC_CONFLICT) {
-            throw new NegocioException("usuario-ja-registrado");
+            throw new NegocioException("erro-perfil-autenticacao");
         }
 
         throw new NegocioException("erro-criar-usuario");
