@@ -10,14 +10,14 @@ import java.io.Serializable;
 public abstract class EntidadeBase<ID extends Serializable> implements Serializable {
 
     private static final long serialVersionUID = -4833492543335464195L;
-
+    public static final int MAX_LENGTH_EXCLUIDO = 1;
+    
     /**
      * Retorna o <code>Id</code> da entidade
      *
      * @return id da entidade
      */
     public abstract ID getId();
-
     public abstract void setId(ID id);
 
     @Override
