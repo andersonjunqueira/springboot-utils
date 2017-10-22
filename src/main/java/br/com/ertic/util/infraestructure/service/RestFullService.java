@@ -19,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.ertic.util.infraestructure.domain.model.EntidadeBase;
+import br.com.ertic.util.infraestructure.domain.model.ExclusaoLogica;
+import br.com.ertic.util.infraestructure.domain.model.SimNao;
 import br.com.ertic.util.infraestructure.exception.InternalException;
 import br.com.ertic.util.infraestructure.exception.NegocioException;
 import br.com.ertic.util.infraestructure.jpa.RepositoryBase;
@@ -82,6 +84,18 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
     @Transactional
     public void delete(PK id) throws NegocioException {
+
+        // MARCADO COM A INTERFACE "ExclusaoLogica", UPDATE
+        for(Class<?> iface : modelClass.getInterfaces()) {
+            if(iface == ExclusaoLogica.class) {
+                E e = repository.findOne(id);
+                ((ExclusaoLogica)e).setExcluido(SimNao.S);
+                repository.save(e);
+                return;
+            }
+        }
+
+        // SEM MARCAÇÃO, APAGA!
         repository.delete(id);
     }
 
@@ -163,6 +177,10 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
             E obj = modelClass.newInstance();
             ExampleMatcher em = matching();
+
+            if(obj instanceof ExclusaoLogica) {
+                ((ExclusaoLogica) obj).setExcluido(SimNao.N);
+            }
 
             for(String key : params.keySet()) {
 
