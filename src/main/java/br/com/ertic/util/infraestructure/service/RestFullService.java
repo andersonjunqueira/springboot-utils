@@ -84,17 +84,17 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
     @Transactional
     public void delete(PK id) throws NegocioException {
-        
+
         // MARCADO COM A INTERFACE "ExclusaoLogica", UPDATE
         for(Class<?> iface : modelClass.getInterfaces()) {
             if(iface == ExclusaoLogica.class) {
-                E e = (E)repository.findOne(id);
+                E e = repository.findOne(id);
                 ((ExclusaoLogica)e).setExcluido(SimNao.S);
                 repository.save(e);
                 return;
             }
-        } 
-        
+        }
+
         // SEM MARCAÇÃO, APAGA!
         repository.delete(id);
     }
@@ -177,6 +177,10 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
             E obj = modelClass.newInstance();
             ExampleMatcher em = matching();
+
+            if(obj instanceof ExclusaoLogica) {
+                ((ExclusaoLogica) obj).setExcluido(SimNao.N);
+            }
 
             for(String key : params.keySet()) {
 
