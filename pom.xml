@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>br.com.ertic</groupId>
+    <groupId>br.com.iwstech</groupId>
     <artifactId>springboot-utils</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
@@ -94,6 +94,20 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>iwstech-m2</id>
+            <url>http://nexus.iwstech.com.br/repository/maven-releases/</url>
+            <uniqueVersion>true</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>iwstech-m2</id>
+            <url>http://nexus.iwstech.com.br/repository/maven-snapshots/</url>
+            <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
 
     <scm>
         <connection>scm:git:https://github.com/andersonjunqueira/springboot-utils.git</connection>
