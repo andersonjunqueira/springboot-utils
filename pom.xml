@@ -94,6 +94,7 @@
                         <releaseStartMessage>iniciando a release</releaseStartMessage>
                         <releaseFinishMessage>fechando a release</releaseFinishMessage>
                     </commitMessages>
+                    <pushRemote>false</pushRemote>
                 </configuration>
             </plugin>
         </plugins>
