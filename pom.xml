@@ -86,6 +86,7 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- -B gitflow:release-start gitflow:release-finish  -->
                 <groupId>com.amashchenko.maven.plugin</groupId>
                 <artifactId>gitflow-maven-plugin</artifactId>
                 <version>1.7.0</version>
