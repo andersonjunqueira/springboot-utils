@@ -72,13 +72,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>jboss</id>
-            <url>https://repository.jboss.org</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -95,6 +88,11 @@
         </plugins>
     </build>
 
+    <scm>
+        <connection>scm:git:https://gitlab.com/aj-public/springboot-utils.git</connection>
+        <developerConnection>scm:git:https://gitlab.com/aj-public/springboot-utils.git</developerConnection>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>iwstech-m2</id>
@@ -107,11 +105,6 @@
             <uniqueVersion>true</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
-
-    <scm>
-        <connection>scm:git:https://github.com/andersonjunqueira/springboot-utils.git</connection>
-        <developerConnection>scm:git:https://github.com/andersonjunqueira/springboot-utils.git</developerConnection>
-    </scm>
 
 </project>
 
