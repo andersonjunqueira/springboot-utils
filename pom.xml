@@ -85,6 +85,17 @@
                     <optimize>true</optimize>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.amashchenko.maven.plugin</groupId>
+                <artifactId>gitflow-maven-plugin</artifactId>
+                <version>1.7.0</version>
+                <configuration>
+                    <commitMessages>
+                        <releaseStartMessage>iniciando a release</releaseStartMessage>
+                        <releaseFinishMessage>fechando a release</releaseFinishMessage>
+                    </commitMessages>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
