@@ -5,7 +5,7 @@
 
     <groupId>br.com.iwstech</groupId>
     <artifactId>springboot-utils</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -85,17 +85,17 @@
                     <optimize>true</optimize>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.amashchenko.maven.plugin</groupId>
-                <artifactId>gitflow-maven-plugin</artifactId>
-                <version>1.7.0</version>
-                <configuration>
-                    <commitMessages>
-                        <releaseStartMessage>iniciando a release</releaseStartMessage>
-                        <releaseFinishMessage>fechando a release</releaseFinishMessage>
-                    </commitMessages>
-                </configuration>
-            </plugin>
+<!--             <plugin> -->
+<!--                 <groupId>com.amashchenko.maven.plugin</groupId> -->
+<!--                 <artifactId>gitflow-maven-plugin</artifactId> -->
+<!--                 <version>1.7.0</version> -->
+<!--                 <configuration> -->
+<!--                     <commitMessages> -->
+<!--                         <releaseStartMessage>iniciando a release</releaseStartMessage> -->
+<!--                         <releaseFinishMessage>fechando a release</releaseFinishMessage> -->
+<!--                     </commitMessages> -->
+<!--                 </configuration> -->
+<!--             </plugin> -->
         </plugins>
     </build>
 
