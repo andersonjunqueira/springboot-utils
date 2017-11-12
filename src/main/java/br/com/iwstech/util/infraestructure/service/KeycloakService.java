@@ -8,7 +8,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +70,7 @@ public class KeycloakService {
     }
 
     private Keycloak getInstance() {
+        // "manage-users, view-clients, view-realm, view-users" roles for "realm-management"
         return Keycloak.getInstance(
             env.getProperty("keycloak.auth-server-url"),
             env.getProperty("keycloak.realm"),
@@ -85,21 +88,22 @@ public class KeycloakService {
         user.setEmail(userEmail);
         user.setEnabled(true);
 
-        Response r = getInstance().realm(env.getProperty("keycloak.realm")).users().create(user);
+        RealmResource realm = getInstance().realm(env.getProperty("keycloak.realm"));
+        UsersResource userResource = realm.users();
+        Response response = userResource.create(user);
 
-        if(r.getStatus() == HttpStatus.SC_CREATED) {
-            String loc = r.getHeaderString("Location");
-            String id = loc.substring(loc.lastIndexOf("/")+1);
+        if(response.getStatus() == HttpStatus.SC_CREATED) {
+            String id = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
 
             try {
                 defineUserPassword(id, userPassword);
                 return id;
             } catch(BadRequestException ex) {
                 getInstance().realm(env.getProperty("keycloak.realm")).users().delete(id);
-                throw new NegocioException("erro-criar-senha");
+                throw new NegocioException("erro-criar-senha", ex);
             }
 
-        } else if (r.getStatus() == HttpStatus.SC_CONFLICT) {
+        } else if (response.getStatus() == HttpStatus.SC_CONFLICT) {
             throw new NegocioException("erro-perfil-autenticacao");
         }
 
