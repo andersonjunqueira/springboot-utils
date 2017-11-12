@@ -29,7 +29,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
     private final String SORT_KEY = "sort";
     private final String DESC_KEY = "desc";
-    private final String PAGESIZE_KEY = "page";
+    private final String PAGESIZE_KEY = "size";
     private final String PAGESTART_KEY = "start";
     private final int PAGESIZE_DEFAULT = 10;
     private static List<String> IGNORED_KEYS = new ArrayList<>();
