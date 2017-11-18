@@ -24,6 +24,7 @@ import br.com.iwstech.util.infraestructure.domain.model.SimNao;
 import br.com.iwstech.util.infraestructure.exception.InternalException;
 import br.com.iwstech.util.infraestructure.exception.NegocioException;
 import br.com.iwstech.util.infraestructure.jpa.RepositoryBase;
+import br.com.iwstech.util.infraestructure.log.Log;
 
 public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable> {
 
@@ -165,6 +166,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         return null;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Example<E> getExample(Map<String, String[]> params) {
 
         if(IGNORED_KEYS.isEmpty()) {
@@ -195,9 +197,10 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
                 Method m = getMethodFromProperty(key);
                 if(m != null) {
+                    Class<?> paramType = m.getParameterTypes()[0];
 
                     // TRATAMENTOS DE PARAMETROS DO TIPO STRING
-                    if(m.getParameterTypes()[0].equals(String.class)) {
+                    if(paramType.isAssignableFrom(String.class)) {
 
                         if(values[0].startsWith("*")) {
                             em = matching().withMatcher(key, matcher -> matcher.endsWith().ignoreCase());
@@ -208,11 +211,24 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
                         } else {
                             em = matching().withMatcher(key, matcher -> matcher.ignoreCase());
                         }
+
+                        m.invoke(obj, values[0].replaceAll("\\*", ""));
+
+                    // TRATAMENTOS DE PARAMETROS DO TIPO SIMNAO ENUM
+                    } else if(paramType.isEnum()) {
+
+                        try {
+                            Class<Enum> ecl = (Class<Enum>)paramType;
+                            Enum<?> v = Enum.valueOf(ecl, values[0]);
+                            if(v != null) {
+                                m.invoke(obj, v);
+                            }
+                        } catch(IllegalArgumentException ex) {
+                            Log.warn(this.getClass(), "Valor não válido para o enum, desconsiderando.");
+                        }
+
                     }
-
-                    m.invoke(obj, values[0].replaceAll("\\*", ""));
                 }
-
             }
 
             return Example.of(obj, em);

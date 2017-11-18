@@ -45,7 +45,7 @@ public class RestFullEndpoint<E extends EntidadeBase<PK>, PK extends Serializabl
         try {
 
             Page<E> saida = service.findAllPageable(request.getParameterMap());
-            if(saida == null || saida.getSize() == 0) {
+            if(saida == null || saida.getTotalElements() == 0) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
                 return new ResponseEntity<>(saida, HttpStatus.OK);
