@@ -107,6 +107,11 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
     @Transactional
     public E add(E e) throws NegocioException {
+        if(e instanceof ExclusaoLogica) {
+            if(((ExclusaoLogica)e).getExcluido() == null) {
+                ((ExclusaoLogica)e).setExcluido(SimNao.N);
+            }
+        }
         return save(e);
     }
 
