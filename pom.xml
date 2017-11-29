@@ -105,6 +105,13 @@
         <developerConnection>scm:git:https://gitlab.com/aj-public/springboot-utils.git</developerConnection>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>iwstech-m2</id>
+            <url>http://nexus.iwstech.com.br/repository/maven-public/</url>
+        </repository>
+    </repositories>
+ 
     <distributionManagement>
         <repository>
             <id>iwstech-m2</id>
