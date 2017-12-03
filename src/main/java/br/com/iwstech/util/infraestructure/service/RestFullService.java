@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.iwstech.util.infraestructure.domain.model.EntidadeBase;
@@ -28,11 +29,12 @@ import br.com.iwstech.util.infraestructure.log.Log;
 
 public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable> {
 
+    private final String PAGE_KEY = "page";
+    private final String PAGELIMIT_KEY = "limit";
     private final String SORT_KEY = "sort";
+
+    private final int PAGELIMIT_DEFAULT = 10;
     private final String DESC_KEY = "desc";
-    private final String PAGESIZE_KEY = "size";
-    private final String PAGESTART_KEY = "start";
-    private final int PAGESIZE_DEFAULT = 10;
     private static List<String> IGNORED_KEYS = new ArrayList<>();
 
     private Class<E> modelClass;
@@ -136,36 +138,43 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
     protected Pageable getPageRequest(Map<String, String[]> params) {
 
-        int start = 0;
-        int size = 10;
+        int page = 0;
+        int limit = 10;
 
-        String[] startParam = params.get(PAGESTART_KEY);
-        if(startParam != null) {
-            start = Integer.parseInt(startParam[0]);
-            start = start < 0 ? 0 : start;
+        String[] pageParam = params.get(PAGE_KEY);
+        if(pageParam != null) {
+            page = Integer.parseInt(pageParam[0]);
+            page = page < 0 ? 0 : page;
         }
 
-        String[] sizeParam = params.get(PAGESIZE_KEY);
-        if(sizeParam != null) {
-            size = Integer.parseInt(sizeParam[0]);
-            size = size < 1 ? PAGESIZE_DEFAULT : size;
+        String[] limitParam = params.get(PAGELIMIT_KEY);
+        if(limitParam != null) {
+            limit = Integer.parseInt(limitParam[0]);
+            limit = limit < 1 ? PAGELIMIT_DEFAULT : limit;
         }
 
-        return new PageRequest(start, size, getSort(params));
+        return new PageRequest(page, limit, getSort(params));
 
     }
 
     protected Sort getSort(Map<String, String[]> params) {
-        String[] sort = params.get(SORT_KEY);
-        if(sort != null && sort.length == 1 && sort[0].length() > 0 ) {
-            String field = sort[0];
-            Sort.Direction direction = Sort.Direction.ASC;
-            if(field.indexOf(",") > -1) {
-                String[] tokens = field.split(",");
-                field = tokens[0];
-                direction = tokens[1].equalsIgnoreCase(DESC_KEY) ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        String[] sortParams = params.get(SORT_KEY);
+        if(sortParams != null && sortParams.length > 0 ) {
+
+            List<Order> orders = new ArrayList<>();
+            for(String sort : sortParams) {
+
+                Sort.Direction direction = Sort.Direction.ASC;
+                if(params.get(sort + ".dir").length > 0) {
+                    if(params.get(sort + ".dir")[0].equalsIgnoreCase(DESC_KEY)) {
+                        direction = Sort.Direction.DESC;
+                    }
+                }
+                orders.add(new Order(direction, sort));
             }
-            return new Sort(direction, field);
+
+            return new Sort(orders);
         }
 
         return null;
@@ -176,8 +185,8 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
         if(IGNORED_KEYS.isEmpty()) {
             IGNORED_KEYS.add(SORT_KEY);
-            IGNORED_KEYS.add(PAGESIZE_KEY);
-            IGNORED_KEYS.add(PAGESTART_KEY);
+            IGNORED_KEYS.add(PAGE_KEY);
+            IGNORED_KEYS.add(PAGELIMIT_KEY);
         }
 
         try {
