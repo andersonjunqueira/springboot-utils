@@ -216,7 +216,10 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
                     // TRATAMENTOS DE PARAMETROS DO TIPO STRING
                     if(paramType.isAssignableFrom(String.class)) {
 
-                        if(values[0].startsWith("*")) {
+                        if(values[0].endsWith("*") && values[0].startsWith("*")) {
+                            em = matching().withMatcher(key, matcher -> matcher.contains().ignoreCase());
+
+                        } else if(values[0].startsWith("*")) {
                             em = matching().withMatcher(key, matcher -> matcher.endsWith().ignoreCase());
 
                         } else if(values[0].endsWith("*")) {
