@@ -181,7 +181,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected Example<E> getExample(Map<String, String[]> params) {
+    protected ExampleMatcher getExampleMatcher(E obj, Map<String, String[]> params) {
 
         if(IGNORED_KEYS.isEmpty()) {
             IGNORED_KEYS.add(SORT_KEY);
@@ -191,7 +191,6 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
         try {
 
-            E obj = modelClass.newInstance();
             ExampleMatcher em = matching();
 
             if(obj instanceof ExclusaoLogica) {
@@ -231,7 +230,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
                         m.invoke(obj, values[0].replaceAll("\\*", ""));
 
-                    // TRATAMENTOS DE PARAMETROS DO TIPO SIMNAO ENUM
+                    // TRATAMENTOS DE PARAMETROS DO TIPO ENUM
                     } else if(paramType.isEnum()) {
 
                         try {
@@ -248,9 +247,19 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
                 }
             }
 
-            return Example.of(obj, em);
+            return em;
 
-        } catch(IllegalAccessException | InstantiationException | InvocationTargetException ex) {
+        } catch(IllegalAccessException | InvocationTargetException ex) {
+            throw new InternalException("problemas-classe-findall", ex);
+        }
+
+    }
+
+    protected Example<E> getExample(Map<String, String[]> params) {
+        try {
+            E obj = modelClass.newInstance();
+            return Example.of(obj, getExampleMatcher(obj, params));
+        } catch(IllegalAccessException | InstantiationException ex) {
             throw new InternalException("problemas-classe-findall", ex);
         }
     }
