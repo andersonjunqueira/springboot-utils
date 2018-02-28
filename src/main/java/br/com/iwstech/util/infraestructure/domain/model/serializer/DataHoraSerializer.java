@@ -15,7 +15,7 @@ public class DataHoraSerializer extends JsonSerializer<Date> {
         throws IOException, JsonProcessingException {
 
         if(value != null) {
-            gen.writeString(DataDeserializer.getParser().format(value));
+            gen.writeString(DataHoraDeserializer.getDateTimeParser().format(value));
         }
 
     }

@@ -15,7 +15,8 @@ import br.com.iwstech.util.infraestructure.log.Log;
 
 public class DataHoraDeserializer extends JsonDeserializer<Date> {
 
-    private static SimpleDateFormat sdf;
+    private static SimpleDateFormat sdfDT;
+    private static SimpleDateFormat sdfD;
 
     @Override
     public Date deserialize(JsonParser p, DeserializationContext ctxt)
@@ -24,20 +25,36 @@ public class DataHoraDeserializer extends JsonDeserializer<Date> {
         final String value = p.getText();
         if(value != null && value.length() > 0) {
             try {
-                return DataHoraDeserializer.getParser().parse(value);
+                return DataHoraDeserializer.getDateTimeParser().parse(value);
+
             } catch (ParseException ex) {
+
                 Log.error(this.getClass(), "Erro processamento de data: " + value, ex);
-                return null;
+
+                try {
+                    return DataHoraDeserializer.getDateParser().parse(value);
+                } catch (ParseException ex1) {
+                    Log.error(this.getClass(), "Erro processamento de data: " + value, ex1);
+                    return null;
+                }
+
             }
         }
         return null;
 
     }
 
-    public static DateFormat getParser() {
-        if(sdf == null) {
-            sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    public static DateFormat getDateTimeParser() {
+        if(sdfDT == null) {
+            sdfDT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         }
-        return sdf;
+        return sdfDT;
+    }
+
+    public static DateFormat getDateParser() {
+        if(sdfD == null) {
+            sdfD = new SimpleDateFormat("yyyy-MM-dd");
+        }
+        return sdfD;
     }
 }
