@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import br.com.iwstech.util.infraestructure.log.Log;
 
-public class DataHoraDeserializer extends JsonDeserializer<Date> {
+public class DataDeserializer extends JsonDeserializer<Date> {
 
     private static SimpleDateFormat sdf;
 
@@ -24,7 +24,7 @@ public class DataHoraDeserializer extends JsonDeserializer<Date> {
         final String value = p.getText();
         if(value != null && value.length() > 0) {
             try {
-                return DataHoraDeserializer.getParser().parse(value);
+                return DataDeserializer.getParser().parse(value);
             } catch (ParseException ex) {
                 Log.error(this.getClass(), "Erro processamento de data: " + value, ex);
                 return null;
@@ -36,7 +36,7 @@ public class DataHoraDeserializer extends JsonDeserializer<Date> {
 
     public static DateFormat getParser() {
         if(sdf == null) {
-            sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            sdf = new SimpleDateFormat("yyyy-MM-dd");
         }
         return sdf;
     }
