@@ -1,7 +1,5 @@
 package br.com.iwstech.util.infraestructure.exception;
 
-import org.springframework.http.HttpStatus;
-
 /**
  * Classe representativa de erro enviada ao frontend.
  * @author Anderson Junqueira, acosorio@stefanini.com
@@ -10,7 +8,6 @@ import org.springframework.http.HttpStatus;
  */
 public class ExceptionDTO {
 
-    private HttpStatus errorCode;
     private String mensagem;
     private String debug;
     private String pilha;
@@ -62,14 +59,6 @@ public class ExceptionDTO {
      */
     public void setPilha(String pilha) {
         this.pilha = pilha;
-    }
-
-    public HttpStatus getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(HttpStatus errorCode) {
-        this.errorCode = errorCode;
     }
 
 }

@@ -1,5 +1,8 @@
 package br.com.iwstech.util.infraestructure.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
  * <p>Super classe para as esceções lançados pelo framework.</p>
  *
@@ -11,7 +14,8 @@ package br.com.iwstech.util.infraestructure.exception;
  * @see <a href="https://httpstatuses.com/">https://httpstatuses.com/</a>
  * @since 1.0.0
  */
-public class RequisicaoInvalidaException extends GeneralException {
+@ResponseStatus(value=HttpStatus.BAD_REQUEST)
+public class ChamadaInvalidaException extends GeneralException {
 
     private static final long serialVersionUID = 7750277264481007108L;
 
@@ -19,7 +23,7 @@ public class RequisicaoInvalidaException extends GeneralException {
      * Construtor padrão da exceção.
      * @param statusCode código de erro HTTP
      */
-    public RequisicaoInvalidaException() {
+    public ChamadaInvalidaException() {
         super();
     }
 
@@ -28,7 +32,7 @@ public class RequisicaoInvalidaException extends GeneralException {
      * @param statusCode código de erro HTTP
      * @param msg mensagem do erro
      */
-    public RequisicaoInvalidaException(String msg) {
+    public ChamadaInvalidaException(String msg) {
         super(msg);
     }
 
@@ -37,7 +41,7 @@ public class RequisicaoInvalidaException extends GeneralException {
      * @param statusCode código de erro HTTP
      * @param cause causa origem da exceção lançada
      */
-    public RequisicaoInvalidaException(Throwable cause) {
+    public ChamadaInvalidaException(Throwable cause) {
         super(cause);
     }
 
@@ -47,7 +51,7 @@ public class RequisicaoInvalidaException extends GeneralException {
      * @param msg mensagem do erro
      * @param cause causa origem da exceção lançada
      */
-    public RequisicaoInvalidaException(String msg, Throwable cause) {
+    public ChamadaInvalidaException(String msg, Throwable cause) {
         super(msg, cause);
     }
 

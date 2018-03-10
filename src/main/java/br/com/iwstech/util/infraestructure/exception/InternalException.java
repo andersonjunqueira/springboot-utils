@@ -1,5 +1,8 @@
 package br.com.iwstech.util.infraestructure.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
  * <p>Super classe para as esceções lançados pelo framework.</p>
  *
@@ -11,6 +14,7 @@ package br.com.iwstech.util.infraestructure.exception;
  * @see <a href="https://httpstatuses.com/">https://httpstatuses.com/</a>
  * @since 1.0.0
  */
+@ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
 public class InternalException extends RuntimeException {
 
     private static final long serialVersionUID = 7750277264481007108L;

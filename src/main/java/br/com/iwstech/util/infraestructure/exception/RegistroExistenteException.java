@@ -1,9 +1,13 @@
 package br.com.iwstech.util.infraestructure.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
  * @author Anderson Junqueira, acosorio@stefanini.com
  */
-public class KCUsuarioJaExisteException extends NegocioException {
+@ResponseStatus(value=HttpStatus.CONFLICT)
+public class RegistroExistenteException extends NegocioException {
 
     private static final long serialVersionUID = 154640526844799318L;
 
@@ -11,7 +15,7 @@ public class KCUsuarioJaExisteException extends NegocioException {
      * Construtor padrão da exceção.
      * @param statusCode código de erro HTTP
      */
-    public KCUsuarioJaExisteException() {
+    public RegistroExistenteException() {
         super();
     }
 
@@ -20,7 +24,7 @@ public class KCUsuarioJaExisteException extends NegocioException {
      * @param statusCode código de erro HTTP
      * @param msg mensagem do erro
      */
-    public KCUsuarioJaExisteException(String msg) {
+    public RegistroExistenteException(String msg) {
         super(msg);
     }
 
@@ -29,7 +33,7 @@ public class KCUsuarioJaExisteException extends NegocioException {
      * @param statusCode código de erro HTTP
      * @param cause causa origem da exceção lançada
      */
-    public KCUsuarioJaExisteException(Throwable cause) {
+    public RegistroExistenteException(Throwable cause) {
         super(cause);
     }
 
@@ -39,7 +43,7 @@ public class KCUsuarioJaExisteException extends NegocioException {
      * @param msg mensagem do erro
      * @param cause causa origem da exceção lançada
      */
-    public KCUsuarioJaExisteException(String msg, Throwable cause) {
+    public RegistroExistenteException(String msg, Throwable cause) {
         super(msg, cause);
     }
 

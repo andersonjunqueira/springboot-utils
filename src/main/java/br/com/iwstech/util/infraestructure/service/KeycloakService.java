@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import br.com.iwstech.util.infraestructure.exception.KCUsuarioJaExisteException;
+import br.com.iwstech.util.infraestructure.exception.RegistroExistenteException;
 import br.com.iwstech.util.infraestructure.exception.NegocioException;
 
 @Service
@@ -66,7 +66,7 @@ public class KeycloakService {
             }
 
         } else if (response.getStatus() == HttpStatus.SC_CONFLICT) {
-            throw new KCUsuarioJaExisteException("email-ja-registrado");
+            throw new RegistroExistenteException("email-ja-registrado");
         }
 
         throw new NegocioException("erro-criar-usuario");

@@ -11,7 +11,7 @@ package br.com.iwstech.util.infraestructure.exception;
  * @see <a href="https://httpstatuses.com/">https://httpstatuses.com/</a>
  * @since 1.0.0
  */
-public class GeneralException extends Exception {
+public abstract class GeneralException extends Exception {
 
     private static final long serialVersionUID = 7750277264481007108L;
 
