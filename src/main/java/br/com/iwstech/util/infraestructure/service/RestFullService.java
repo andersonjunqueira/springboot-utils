@@ -180,7 +180,6 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         return null;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected ExampleMatcher getExampleMatcher(E obj, Map<String, String[]> params) {
 
         if(IGNORED_KEYS.isEmpty()) {
@@ -212,36 +211,17 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
                 if(m != null) {
                     Class<?> paramType = m.getParameterTypes()[0];
 
-                    // TRATAMENTOS DE PARAMETROS DO TIPO STRING
-                    if(paramType.isAssignableFrom(String.class)) {
-
-                        if(values[0].endsWith("*") && values[0].startsWith("*")) {
-                            em = matching().withMatcher(key, matcher -> matcher.contains().ignoreCase());
-
-                        } else if(values[0].startsWith("*")) {
-                            em = matching().withMatcher(key, matcher -> matcher.endsWith().ignoreCase());
-
-                        } else if(values[0].endsWith("*")) {
-                            em = matching().withMatcher(key, matcher -> matcher.startsWith().ignoreCase());
-
-                        } else {
-                            em = matching().withMatcher(key, matcher -> matcher.ignoreCase());
-                        }
-
-                        m.invoke(obj, values[0].replaceAll("\\*", ""));
-
                     // TRATAMENTOS DE PARAMETROS DO TIPO ENUM
-                    } else if(paramType.isEnum()) {
+                    if(paramType.isEnum()) {
+                        invokeEnum(obj, m, values[0]);
 
-                        try {
-                            Class<Enum> ecl = (Class<Enum>)paramType;
-                            Enum<?> v = Enum.valueOf(ecl, values[0]);
-                            if(v != null) {
-                                m.invoke(obj, v);
-                            }
-                        } catch(IllegalArgumentException ex) {
-                            Log.warn(this.getClass(), "Valor não válido para o enum, desconsiderando.");
-                        }
+                    // TRATAMENTOS DE PARAMETROS DO TIPO LONG
+                    } else if(paramType.isAssignableFrom(Long.class)) {
+                        invokeLong(obj, m, values[0]);
+
+                    // TRATAMENTOS DE PARAMETROS DO TIPO STRING
+                    } else if(paramType.isAssignableFrom(String.class)) {
+                        em = invokeString(obj, m, values[0], key);
 
                     }
                 }
@@ -274,4 +254,54 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         return null;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void invokeEnum(Object obj, Method m, String value)
+        throws IllegalAccessException, InvocationTargetException {
+        try {
+            Class<?> paramType = m.getParameterTypes()[0];
+            Class<Enum> ecl = (Class<Enum>)paramType;
+            Enum<?> v = Enum.valueOf(ecl, value);
+            if(v != null) {
+                m.invoke(obj, v);
+            }
+        } catch(IllegalArgumentException ex) {
+            Log.warn(this.getClass(), "Valor não válido para o enum, desconsiderando.");
+        }
+    }
+
+    private void invokeLong(Object obj, Method m, String value)
+        throws IllegalAccessException, InvocationTargetException {
+        try {
+            m.invoke(obj, new Long(value));
+        } catch(IllegalArgumentException ex) {
+            Log.warn(this.getClass(), "Valor numérico não válido, desconsiderando.");
+        }
+    }
+
+    private ExampleMatcher invokeString(Object obj, Method m, String value, String key)
+        throws IllegalAccessException, InvocationTargetException {
+        ExampleMatcher em = matching();
+        try {
+
+            if(value.endsWith("*") && value.startsWith("*")) {
+                em = matching().withMatcher(key, matcher -> matcher.contains().ignoreCase());
+
+            } else if(value.startsWith("*")) {
+                em = matching().withMatcher(key, matcher -> matcher.endsWith().ignoreCase());
+
+            } else if(value.endsWith("*")) {
+                em = matching().withMatcher(key, matcher -> matcher.startsWith().ignoreCase());
+
+            } else {
+                em = matching().withMatcher(key, matcher -> matcher.ignoreCase());
+            }
+
+            m.invoke(obj, value.replaceAll("\\*", ""));
+
+        } catch(IllegalArgumentException ex) {
+            Log.warn(this.getClass(), "Valor textual não válido, desconsiderando.");
+        }
+
+        return em;
+    }
 }
