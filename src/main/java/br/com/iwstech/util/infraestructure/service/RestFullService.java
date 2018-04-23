@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,7 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         return repository.findAll(getExample(params), getSort(params));
     }
 
-    public Page<E> findAllPageable(Map<String, String[]> params) throws NegocioException {
+    public Page<E> findAllPageable(Map<String, String[]> params, Principal principal) throws NegocioException {
         return repository.findAll(getExample(params), getPageRequest(params));
     }
 

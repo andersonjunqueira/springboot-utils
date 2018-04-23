@@ -1,10 +1,15 @@
 package br.com.iwstech.util.infraestructure.web;
 
+import br.com.iwstech.util.infraestructure.domain.model.EntidadeBase;
+import br.com.iwstech.util.infraestructure.exception.NegocioException;
+import br.com.iwstech.util.infraestructure.service.RestFullService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import java.io.IOException;
 import java.io.Serializable;
-
+import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
-
+import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -16,18 +21,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-
-import br.com.iwstech.util.infraestructure.domain.model.EntidadeBase;
-import br.com.iwstech.util.infraestructure.dto.Token;
-import br.com.iwstech.util.infraestructure.exception.NegocioException;
-import br.com.iwstech.util.infraestructure.service.RestFullService;
-
 public class RestFullEndpoint<E extends EntidadeBase<PK>, PK extends Serializable> {
 
     @Autowired
-    protected Token token;
+    protected AccessToken accessToken;
 
     protected RestFullService<E, PK> service;
 
@@ -40,8 +37,8 @@ public class RestFullEndpoint<E extends EntidadeBase<PK>, PK extends Serializabl
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> findAllPageable(HttpServletRequest request) throws NegocioException {
-        Page<E> saida = service.findAllPageable(request.getParameterMap());
+    public ResponseEntity<?> findAllPageable(HttpServletRequest request, Principal principal) throws NegocioException {
+        Page<E> saida = service.findAllPageable(request.getParameterMap(), principal);
         if(saida == null || saida.getTotalElements() == 0) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
@@ -68,7 +65,7 @@ public class RestFullEndpoint<E extends EntidadeBase<PK>, PK extends Serializabl
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> add(
         HttpServletRequest request,
-        UriComponentsBuilder b,
+        UriComponentsBuilder b, Principal principal,
         @RequestBody E input) throws NegocioException {
         if(input.getId() != null) {
             return new ResponseEntity<>("erro-id-desnecessario", HttpStatus.BAD_REQUEST);
