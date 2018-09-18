@@ -1,6 +1,7 @@
 package br.com.iwstech.util.infraestructure.service;
 
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.BadRequestException;
@@ -12,13 +13,15 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import br.com.iwstech.util.infraestructure.exception.RegistroExistenteException;
+import br.com.iwstech.util.infraestructure.domain.model.SimNao;
 import br.com.iwstech.util.infraestructure.exception.NegocioException;
+import br.com.iwstech.util.infraestructure.exception.RegistroExistenteException;
 
 @Service
 public class KeycloakService {
@@ -36,7 +39,7 @@ public class KeycloakService {
             env.getProperty("admin.keycloak.clientid"));
     }
 
-    public String createUser(String firstName, String lastName, String userEmail, String userPassword) throws NegocioException {
+    public String createUser(String firstName, String lastName, String userEmail, String userPassword, SimNao adminComunidade) throws NegocioException {
 
         UserRepresentation user = new UserRepresentation();
         user.setUsername(userEmail);
@@ -47,6 +50,7 @@ public class KeycloakService {
 
         RealmResource realm = getInstance().realm(env.getProperty("keycloak.realm"));
         UsersResource userResource = realm.users();
+        
 
         // CRIANDO O USUARIO
         Response response = userResource.create(user);
@@ -55,7 +59,10 @@ public class KeycloakService {
             // RECUPERANDO O ID
             String id = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
             try {
-
+            	
+            	if(adminComunidade.equals(SimNao.S)) {
+            		atualizarPermissao(userEmail,SimNao.S);
+            	}
                 // DEFININDO A SENHA
                 defineUserPassword(id, userPassword);
                 return id;
@@ -71,6 +78,23 @@ public class KeycloakService {
 
         throw new NegocioException("erro-criar-usuario");
 
+    }
+    
+    public void atualizarPermissao(String email,SimNao adminComunidade) throws NegocioException {
+	
+    		UserRepresentation kcu = findUserByEmail(email);
+    			
+		RealmResource realm = getInstance().realm(env.getProperty("keycloak.realm"));
+        UsersResource userResource = realm.users();
+    			
+        RoleRepresentation admComunidadeRealmRole = realm.roles().get("adm_comunidade").toRepresentation();
+        if(adminComunidade.equals(SimNao.S)) {
+        		userResource.get(kcu.getId()).roles().realmLevel().add(Arrays.asList(admComunidadeRealmRole));	
+        }
+        else {
+    			userResource.get(kcu.getId()).roles().realmLevel().remove(Arrays.asList(admComunidadeRealmRole));	
+        	
+        }
     }
 
     public void defineUserPassword(String userId, String userPassword) throws NegocioException {
