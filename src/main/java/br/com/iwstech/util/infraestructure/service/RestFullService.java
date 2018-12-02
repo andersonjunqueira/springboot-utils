@@ -7,7 +7,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.security.Principal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +61,10 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
         return repository;
     }
 
+    public Long count() throws NegocioException {
+        return repository.count();
+    }
+    
     public List<E> findAll() throws NegocioException {
         return repository.findAll();
     }
@@ -214,16 +221,21 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
 
                     // TRATAMENTOS DE PARAMETROS DO TIPO ENUM
                     if(paramType.isEnum()) {
-                        invokeEnum(obj, m, values[0]);
+	                    	
+	                    	if(!values.equals("-")) {
+	               			 invokeEnum(obj, m, values[0]);
+	               		}
 
                     // TRATAMENTOS DE PARAMETROS DO TIPO LONG
+                    } else if(paramType.isAssignableFrom(Date.class)) {
+                    	 	invokeDate(obj, m, values[0]);
+                    	 	
                     } else if(paramType.isAssignableFrom(Long.class)) {
                         invokeLong(obj, m, values[0]);
 
                     // TRATAMENTOS DE PARAMETROS DO TIPO STRING
                     } else if(paramType.isAssignableFrom(String.class)) {
                         em = invokeString(obj, m, values[0], key);
-
                     }
                 }
             }
@@ -278,6 +290,21 @@ public class RestFullService<E extends EntidadeBase<PK>, PK extends Serializable
             Log.warn(this.getClass(), "Valor numérico não válido, desconsiderando.");
         }
     }
+    
+    private void invokeDate(Object obj, Method m, String value)
+            throws IllegalAccessException, InvocationTargetException {
+            try {
+            		
+            	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            	
+                m.invoke(obj, sdf.parse(value));
+            } catch(IllegalArgumentException ex) {
+                Log.warn(this.getClass(), "Valor numérico não válido, desconsiderando.");
+            } catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
 
     private ExampleMatcher invokeString(Object obj, Method m, String value, String key)
         throws IllegalAccessException, InvocationTargetException {
