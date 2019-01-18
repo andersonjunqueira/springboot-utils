@@ -91,7 +91,7 @@ public class RestFullEndpoint<E extends EntidadeBase<PK>, PK extends Serializabl
    @RequestMapping(method = RequestMethod.PUT)
    public ResponseEntity<?> addOrUpdateEntity(
        HttpServletRequest request,
-       UriComponentsBuilder b,
+       UriComponentsBuilder b, Principal principal,
        @RequestBody E input) throws NegocioException {
        boolean creation = input.getId() == null;
 
